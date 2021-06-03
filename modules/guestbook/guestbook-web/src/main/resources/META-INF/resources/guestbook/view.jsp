@@ -1,21 +1,42 @@
-<%@ include file="/META-INF/resources/init.jsp" %>
+<%@ page import="com.liferay.docs.guestbook.service.GuestbookEntryLocalServiceUtil" %>
+<%@include file="../init.jsp"%>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
+<%
+	long guestbookId = Long.valueOf((Long) renderRequest
+			.getAttribute("guestbookId"));
+%>
 
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
-<%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
-<%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
-<%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
+<aui:button-row cssClass="guestbook-buttons">
 
-<portlet:defineObjects />
+	<portlet:renderURL var="addEntryURL">
+		<portlet:param name="mvcPath" value="/guestbook/edit_entry.jsp" />
+		<portlet:param name="guestbookId"
+					   value="<%=String.valueOf(guestbookId)%>" />
+	</portlet:renderURL>
 
-<liferay-theme:defineObjects />
+	<aui:button onClick="<%=addEntryURL.toString()%>" value="Add Entry"></aui:button>
 
-<portlet:renderURL var="addEntryURL">
-	<portlet:param name="mvcPath" value="/guestbook/edit_entry.jsp"></portlet:param>
-</portlet:renderURL>
-
-<aui:button-row>
-	<aui:button onClick="<%= addEntryURL.toString() %>" value="Add Entry"></aui:button>
 </aui:button-row>
+
+<liferay-ui:search-container total="<%=GuestbookEntryLocalServiceUtil.getGuestbookEntriesCount()%>">
+	<liferay-ui:search-container-results
+			results="<%=GuestbookEntryLocalServiceUtil.getGuestbookEntries(scopeGroupId.longValue(),
+                    guestbookId, searchContainer.getStart(),
+                    searchContainer.getEnd())%>" />
+
+	<liferay-ui:search-container-row
+			className="com.liferay.docs.guestbook.model.GuestbookEntry" modelVar="entry">
+
+		<liferay-ui:search-container-column-text property="message" />
+
+		<liferay-ui:search-container-column-text property="name" />
+
+		<liferay-ui:search-container-column-jsp
+				align="right"
+				path="/guestbook/entry_actions.jsp" />
+
+	</liferay-ui:search-container-row>
+
+	<liferay-ui:search-iterator />
+
+</liferay-ui:search-container>
